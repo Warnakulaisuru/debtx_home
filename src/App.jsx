@@ -1,49 +1,81 @@
-import React, { useRef, useEffect } from 'react';
-import './index.css'; // import global styles
-import bgVideo from './assets/video.mp4'; // replace with your actual video
+import React, { useRef, useEffect, useState } from 'react';
+import { useMsal } from "@azure/msal-react";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './index.css';
+import bgVideo from './assets/video.mp4';
 
 export default function App() {
   const videoRef = useRef(null);
+  const { instance } = useMsal();
+  const navigate = useNavigate();
+  const [socialLoading, setSocialLoading] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.playbackRate = 0.8; // slower video playback
+      videoRef.current.playbackRate = 0.8;
     }
   }, []);
 
-  const navigate = (path) => {
-    window.location.href = path;
-  };
+const handleAzureLogin = async () => {
+  navigate("/slt"); // Navigate to /slt immediately
+  setSocialLoading("Azure");
+
+  try {
+    const loginResponse = await instance.loginPopup({
+      scopes: ["openid", "profile", "email"],
+    });
+
+    const idToken = loginResponse.idToken;
+
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/azure`, {
+      code: idToken,
+    });
+
+    localStorage.setItem("accessToken", response.data.accessToken);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+
+    navigate("slt/dashboard"); // Navigate to dashboard after successful login
+  } catch (err) {
+    console.error("Azure login failed:", err);
+    setError("Azure login failed. Please contact support.");
+    navigate("/"); // Optional: return to home on error
+  } finally {
+    setSocialLoading("");
+  }
+};
+
+
+  const navigateToDRC = () => navigate('/drc/');
 
   return (
     <div style={containerStyle}>
-      {/* Background Video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={videoStyle}
-      >
+      <video ref={videoRef} autoPlay loop muted playsInline style={videoStyle}>
         <source src={bgVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      {/* Fixed Overlay */}
       <div style={fixedOverlayStyle}>
         <h1 style={headingStyle}>Welcome to DebtX</h1>
+
         <div style={buttonContainerStyle}>
           <button
-            onClick={() => navigate('/slt/')}
-            style={buttonStyle}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'translateY(2px)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+            className="p-2 rounded-full bg-white border hover:bg-gray-100"
+            onClick={handleAzureLogin}
+            disabled={socialLoading !== ""}
           >
-            SLT
+            {socialLoading === "Azure" ? (
+              <span>Pending...</span>
+            ) : (
+              <span className="text-blue-800 font-semibold text-sm">
+                Azure
+              </span>
+            )}
           </button>
+
           <button
-            onClick={() => navigate('/drc/')}
+            onClick={navigateToDRC}
             style={buttonStyle}
             onMouseDown={(e) => (e.currentTarget.style.transform = 'translateY(2px)')}
             onMouseUp={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
@@ -51,6 +83,8 @@ export default function App() {
             DRC
           </button>
         </div>
+
+        {error && <p style={{ color: 'white', marginTop: '1rem' }}>{error}</p>}
       </div>
     </div>
   );
@@ -60,12 +94,12 @@ export default function App() {
 const containerStyle = {
   position: 'relative',
   width: '100vw',
-  height: '100svh', // better for mobile viewport height
+  height: '100svh',
   overflow: 'hidden',
 };
 
 const videoStyle = {
-  position: 'fixed', // fixed so it covers viewport always
+  position: 'fixed',
   top: 0,
   left: 0,
   width: '100%',
@@ -75,7 +109,7 @@ const videoStyle = {
 };
 
 const fixedOverlayStyle = {
-  position: 'fixed', // fixed overlay in center
+  position: 'fixed',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
