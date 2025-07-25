@@ -52,6 +52,18 @@ export default function App() {
           </button>
         </div>
       </div>
+      <button
+  style={{
+    position: 'fixed',
+    bottom: '10px',
+    right: '10px',
+  }}
+  onClick={() => window.location.href = '/test'}
+>
+  test
+</button>
+
+
     </div>
   );
 }
