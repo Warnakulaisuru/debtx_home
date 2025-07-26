@@ -59,7 +59,7 @@ export default function App() {
           bottom: "10px",
           right: "80px",
         }}
-        onClick={() => (window.location.href = "/test/slt")}
+        onClick={() => (window.location.href = "/test/slt/")}
       >
         test slt
       </button>
@@ -69,7 +69,7 @@ export default function App() {
           bottom: "10px",
           right: "10px",
         }}
-        onClick={() => (window.location.href = "/test/drc")}
+        onClick={() => (window.location.href = "/test/drc/")}
       >
         test drc
       </button>
