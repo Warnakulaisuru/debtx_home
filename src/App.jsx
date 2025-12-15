@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import "./index.css"; // import global styles
 import bgVideo from "./assets/video.mp4"; // replace with your actual video
+import SnowCanvas from "./components/SnowCanvas";
 
 export default function App() {
   const videoRef = useRef(null);
@@ -22,6 +23,8 @@ export default function App() {
         <source src={bgVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+
+      <SnowCanvas />
 
       {/* Fixed Overlay */}
       <div style={fixedOverlayStyle}>
