@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const SnowCanvas = () => {
   const canvasRef = useRef(null);
@@ -13,13 +13,22 @@ const SnowCanvas = () => {
     canvas.width = width;
     canvas.height = height;
 
-    const snowflakes = Array.from({ length: 120 }, () => ({
+    // const snowflakes = Array.from({ length: 120 }, () => ({
+    //   x: Math.random() * width,
+    //   y: Math.random() * height,
+    //   size: Math.random() * 6 + 6,
+    //   speed: Math.random() * 1 + 0.5,
+    //   rotation: Math.random() * Math.PI,
+    //   rotationSpeed: Math.random() * 0.01,
+    // }));
+
+    const snowflakes = Array.from({ length: 40 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: Math.random() * 6 + 6,
-      speed: Math.random() * 1 + 0.5,
+      size: Math.random() * 3 + 4,
+      speed: Math.random() * 0.4 + 0.2,
       rotation: Math.random() * Math.PI,
-      rotationSpeed: Math.random() * 0.01,
+      rotationSpeed: Math.random() * 0.003,
     }));
 
     const drawSnowflake = (x, y, size, rotation) => {
@@ -36,7 +45,6 @@ const SnowCanvas = () => {
         ctx.lineTo(0, size);
         ctx.stroke();
 
-        // branches
         ctx.beginPath();
         ctx.moveTo(0, size * 0.5);
         ctx.lineTo(size * 0.2, size * 0.7);
@@ -52,11 +60,12 @@ const SnowCanvas = () => {
     };
 
     const animate = () => {
+      // ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
       ctx.clearRect(0, 0, width, height);
 
       snowflakes.forEach((flake) => {
         drawSnowflake(flake.x, flake.y, flake.size, flake.rotation);
-
         flake.y += flake.speed;
         flake.rotation += flake.rotationSpeed;
 
@@ -89,6 +98,8 @@ const SnowCanvas = () => {
         position: "fixed",
         top: 0,
         left: 0,
+        width: "100%",
+        height: "100%",
         pointerEvents: "none",
         zIndex: 9999,
       }}
