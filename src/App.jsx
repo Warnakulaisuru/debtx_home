@@ -24,7 +24,7 @@ export default function App() {
         Your browser does not support the video tag.
       </video>
 
-      <SnowCanvas />
+      {/* <SnowCanvas /> */}
 
       {/* Fixed Overlay */}
       <div style={fixedOverlayStyle}>
